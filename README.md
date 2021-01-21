@@ -1,5 +1,7 @@
 # guitar-io
 
+Hosted on https://dvalent.github.io/guitar-io/
+
 ## Project setup
 ```
 npm install
