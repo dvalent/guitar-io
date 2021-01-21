@@ -15,9 +15,9 @@
           v-if="n == 1"
           class="note"
         >
-          <p>
+          <div>
             <v-icon color="grey darken-2">mdi-music-note</v-icon>
-          </p>
+          </div>
         </div>
       </div>
     </div>
@@ -29,7 +29,7 @@
 // import Note from "~/components/note";
 export default {
   // components: { Note },
-  props: ["on", "guitar", "loop"],
+  props: ["on", "guitar", "loop", "audioCtx"],
   data() {
     return {
       selected: null,
@@ -52,6 +52,32 @@ export default {
     this.parseExercise();
   },
   methods: {
+    playNote(frequency, duration) {
+      // create Oscillator node
+      var oscillator = this.audioCtx.createOscillator();
+
+      oscillator.type = "square";
+      oscillator.frequency.value = frequency; // value in hertz
+      oscillator.connect(this.audioCtx.destination);
+      oscillator.start();
+      setTimeout(function () {
+        oscillator.stop();
+        this.playNote(frequency, duration);
+      }, duration);
+    },
+    findHz(string, fret) {
+      let tuning = {
+        1: 329.63,
+        2: 246.94,
+        3: 196.0,
+        4: 146.83,
+        5: 110.0,
+        6: 82.41,
+      };
+      console.log("tuning", tuning[string]);
+      let ex = Math.pow(1.059463094, fret);
+      return tuning[string] * ex;
+    },
     noteColor() {
       return "#E2E2E2";
     },
@@ -76,6 +102,8 @@ export default {
         const e = this.notesList[i];
         this.selected = `${e[0]}-${e[1]}`;
         console.log("fret: ", this.selected);
+        console.log("CONSTRUCT NOTE", this.findHz(e[0], e[1]));
+        this.playNote(this.findHz(e[0], e[1]), 100);
         let activenote = document.getElementById(this.selected);
         activenote.style.background = "yellow";
         await new Promise((r) => {
