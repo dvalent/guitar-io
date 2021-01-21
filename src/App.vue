@@ -1,28 +1,44 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-app-bar
+      dense
+      app
+      color="white"
+      dark
+    >
+      <div class="d-flex align-center">
+        <h2>Guitar-io</h2>
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn
+        target="_blank"
+        text
+      >
+        <v-icon color=black>mdi-account-circle-outline</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <Guitar />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import HelloWorld from "./components/HelloWorld";
+import Guitar from "./components/Guitar";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
-</script>
+  name: "App",
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+  components: {
+    Guitar,
+  },
+
+  data: () => ({
+    //
+  }),
+};
+</script>
