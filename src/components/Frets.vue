@@ -2,7 +2,8 @@
   <div class="fretboard">
     <div
       class="fret"
-      v-for="(fret, j) in guitar.frets"
+      v-for="(fret, j) in frets"
+      :style=fretHeight(j)
       :key=fret
     >
       <div
@@ -29,9 +30,10 @@
 // import Note from "~/components/note";
 export default {
   // components: { Note },
-  props: ["on", "guitar", "loop", "audioCtx"],
+  props: ["on", "guitar", "loop", "audio", "reset", "starting", "frets"],
   data() {
     return {
+      tempo: 200,
       selected: null,
       notesList: [],
       notesListLoop: [],
@@ -39,26 +41,49 @@ export default {
     };
   },
   watch: {
+    reset() {
+      clearInterval(this.playing);
+    },
+    frets() {
+      clearInterval(this.playing);
+      this.notesList = [];
+      console.log("starting at: ", this.starting);
+      this.parseExercise();
+    },
     on(d) {
       if (d == true) {
-        console.log("changed to: ", d);
+        console.log("Playing is: ", d);
         this.test();
       } else if (d == false) {
         clearInterval(this.playing);
+        if (this.selected != null) {
+          let activenote = document.getElementById(this.selected);
+          activenote.style.background = "grey";
+        }
       }
     },
   },
   mounted() {
+    clearInterval(this.playing);
+    this.notesList = [];
+    console.log("starting at: ", this.starting);
     this.parseExercise();
   },
   methods: {
+    fretHeight(f) {
+      if (f == 0 && this.starting == 0) {
+        return `height:35px`;
+      } else {
+        return `height:70px`;
+      }
+    },
     playNote(frequency, duration) {
       // create Oscillator node
-      var oscillator = this.audioCtx.createOscillator();
+      var oscillator = this.audio.createOscillator();
 
       oscillator.type = "square";
       oscillator.frequency.value = frequency; // value in hertz
-      oscillator.connect(this.audioCtx.destination);
+      oscillator.connect(this.audio.destination);
       oscillator.start();
       setTimeout(function () {
         oscillator.stop();
@@ -67,16 +92,16 @@ export default {
     },
     findHz(string, fret) {
       let tuning = {
-        1: 329.63,
-        2: 246.94,
-        3: 196.0,
-        4: 146.83,
-        5: 110.0,
-        6: 82.41,
+        1: 82.41,
+        2: 110.0,
+        3: 146.83,
+        4: 196.0,
+        5: 246.94,
+        6: 329.63,
       };
       console.log("tuning", tuning[string]);
-      let ex = Math.pow(1.059463094, fret);
-      return tuning[string] * ex;
+      //https://pages.mtu.edu/~suits/NoteFreqCalcs.html
+      return tuning[string] * Math.pow(1.059463094, fret);
     },
     noteColor() {
       return "#E2E2E2";
@@ -89,6 +114,7 @@ export default {
       let playback = this.notesList;
 
       if (this.loop == true) {
+        console.log("mirroring");
         let mirror = playback.slice();
         mirror.reverse();
         console.log("THIS", mirror);
@@ -103,25 +129,25 @@ export default {
         this.selected = `${e[0]}-${e[1]}`;
         console.log("fret: ", this.selected);
         console.log("CONSTRUCT NOTE", this.findHz(e[0], e[1]));
-        this.playNote(this.findHz(e[0], e[1]), 100);
+        this.playNote(this.findHz(e[0], e[1]), this.tempo);
         let activenote = document.getElementById(this.selected);
         activenote.style.background = "yellow";
         await new Promise((r) => {
-          this.playing = setTimeout(r, 200);
+          this.playing = setTimeout(r, this.tempo);
         });
         //change selected to index - for stop and start
         activenote.style.background = "grey";
         //emit stop
         if (i == this.notesList.length - 1) {
-          i = 0;
+          i = -1;
         }
       }
     },
 
     parseExercise() {
       for (let i = 1; i < 7; i++) {
-        for (let j = 0; j < this.guitar.frets.length; j++) {
-          const e = this.guitar.frets[j];
+        for (let j = 0; j < this.frets.length; j++) {
+          const e = this.frets[j];
           if (e[i] == "1") {
             let n = [i.toString(), j.toString()];
             this.notesList.push(n);
@@ -148,8 +174,7 @@ export default {
   justify-content: space-between;
   background: rgb(226, 226, 226);
   border-top: 1px solid rgb(95, 125, 255);
-  height: 70px;
-  width: 250px;
+  width: 100%;
 }
 .string {
   width: 3px;

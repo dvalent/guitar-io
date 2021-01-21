@@ -1,44 +1,66 @@
 <template>
 
   <v-container>
-    <v-row>
-      <v-col cols=6>
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col
+        cols=4
+        class=" mt-4"
+      >
         <Frets
           :on=play.on
-          :guitar=data
+          :guitar=guitardata
+          :frets=guitardata.frets
           :loop=switch1
-          :audioCtx=audioCtx
+          :audio=audioCtx
+          :reset=reset
+          :starting="0"
         />
       </v-col>
-      <v-col>
-        <v-row>Data:</v-row>
-        <v-row
-          v-for="i in data.frets"
-          :key="i"
-        >
-          <p>{{i}}</p>
+    </v-row>
+    <v-row
+      align="center"
+      justify="center"
+    >
+      <v-col
+        class="pa-4 mt-4"
+        cols=4
+      >
+
+        <v-row>
+
+          <v-btn
+            @click=OnPlay
+            width="15"
+            :color=play.color
+          >{{play.text}}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn>
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-switch
+            v-model="switch1"
+            label="loop"
+          ></v-switch>
+          <v-spacer></v-spacer>
+          <v-btn @click=Audio>
+            <v-icon>mdi-metronome</v-icon>
+          </v-btn>
+
+        </v-row>
+        <v-row>
+          <v-select
+            item-text="name"
+            item-value="notes"
+            :items=exerciseDB
+            v-model=guitardata.frets
+          ></v-select>
         </v-row>
       </v-col>
-    </v-row>
-    <v-row>
-
-      <v-btn
-        @click=OnPlay
-        width="15"
-        :color=play.color
-      >{{play.text}}</v-btn>
-      <v-btn>
-        <v-icon>mdi-refresh</v-icon>
-      </v-btn>
-      <v-switch
-        v-model="switch1"
-        label="loop back"
-      ></v-switch>
-
-      <v-btn @click=Audio>
-        <v-icon>mdi-metronome</v-icon>
-      </v-btn>
-
     </v-row>
 
   </v-container>
@@ -50,17 +72,70 @@ import Frets from "./Frets";
 export default {
   data() {
     return {
-      data: {
+      audioCtx: null,
+      switch1: false,
+      reset: false,
+      exerciseDB: [
+        {
+          name: "E Minor Pentatonic",
+          notes: [
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "1", 6: "1" },
+            { 1: "0", 2: "0", 3: "0", 4: "0", 5: "0", 6: "0" },
+            { 1: "0", 2: "0", 3: "0", 4: "0", 5: "0", 6: "0" },
+            { 1: "0", 2: "1", 3: "1", 4: "1", 5: "0", 6: "0" },
+            { 1: "1", 2: "0", 3: "0", 4: "0", 5: "1", 6: "1" },
+          ],
+        },
+        {
+          name: "C Major Scale",
+          notes: [
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "1", 6: "1" },
+            { 1: "1", 2: "0", 3: "0", 4: "0", 5: "1", 6: "1" },
+            { 1: "0", 2: "1", 3: "1", 4: "1", 5: "0", 6: "0" },
+            { 1: "1", 2: "1", 3: "1", 4: "0", 5: "1", 6: "1" },
+          ],
+        },
+        {
+          name: "G Major Scale",
+          notes: [
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "1", 6: "1" },
+            { 1: "0", 2: "0", 3: "0", 4: "0", 5: "1", 6: "0" },
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "0", 6: "1" },
+            { 1: "1", 2: "1", 3: "1", 4: "0", 5: "1", 6: "1" },
+            { 1: "0", 2: "0", 3: "1", 4: "0", 5: "0", 6: "0" },
+          ],
+        },
+        {
+          name: "E Harmonic Minor (Open Position)",
+          notes: [
+            { 1: "1", 2: "1", 3: "0", 4: "1", 5: "1", 6: "1" },
+            { 1: "0", 2: "0", 3: "1", 4: "0", 5: "1", 6: "0" },
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "0", 6: "1" },
+            { 1: "1", 2: "1", 3: "0", 4: "0", 5: "0", 6: "1" },
+            { 1: "0", 2: "0", 3: "1", 4: "0", 5: "1", 6: "0" },
+          ],
+        },
+        {
+          name: "Dorian",
+          notes: [
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "0", 6: "0" },
+            { 1: "0", 2: "0", 3: "0", 4: "0", 5: "0", 6: "0" },
+            { 1: "1", 2: "1", 3: "1", 4: "1", 5: "1", 6: "1" },
+            { 1: "1", 2: "0", 3: "0", 4: "0", 5: "1", 6: "1" },
+            { 1: "0", 2: "0", 3: "1", 4: "1", 5: "1", 6: "0" },
+            { 1: "0", 2: "0", 3: "0", 4: "0", 5: "1", 6: "1" },
+          ],
+        },
+      ],
+      guitardata: {
         tempo: 100,
-        audioCtx: null,
-        switch1: false,
-        starting: 1,
+        starting: null,
         frets: [
-          { 1: "1", 2: "0", 3: "1", 4: "1", 5: "0", 6: "1" },
+          { 1: "1", 2: "1", 3: "1", 4: "1", 5: "1", 6: "1" },
           { 1: "0", 2: "0", 3: "0", 4: "0", 5: "0", 6: "0" },
-          { 1: "0", 2: "0", 3: "0", 4: "1", 5: "0", 6: "0" },
-          { 1: "1", 2: "0", 3: "1", 4: "0", 5: "0", 6: "1" },
-          { 1: "1", 2: "0", 3: "0", 4: "0", 5: "1", 6: "0" },
+          { 1: "0", 2: "0", 3: "0", 4: "0", 5: "0", 6: "0" },
+          { 1: "0", 2: "1", 3: "1", 4: "1", 5: "0", 6: "0" },
+          { 1: "1", 2: "0", 3: "0", 4: "0", 5: "1", 6: "1" },
         ],
       },
       play: { on: false, text: "Play", color: "success" },
@@ -136,6 +211,7 @@ export default {
     },
   },
   mounted() {
+    this.starting = 0;
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   },
   components: { Frets },
