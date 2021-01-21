@@ -1,6 +1,4 @@
 module.exports = {
-  "publicPath": "/guitar-io/",
-  "transpileDependencies": [
-    "vuetify"
-  ]
-}
+  publicPath: "/guitar-io/",
+  transpileDependencies: ["vuetify"],
+};
