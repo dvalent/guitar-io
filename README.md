@@ -1,6 +1,5 @@
 # guitar-io
-
-Hosted on https://dvalent.github.io/guitar-io/
+Guitar-IO is constructed using the VUE framework and currently hosted on [Guitar-io] (https://dvalent.github.io/guitar-io/)
 
 ## Project setup
 ```
@@ -15,11 +14,6 @@ npm run serve
 ### Compiles and minifies for production
 ```
 npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
 ```
 
 ### Customize configuration
