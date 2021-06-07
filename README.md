@@ -1,5 +1,5 @@
 # guitar-io
-Guitar-IO is constructed using the VUE framework and currently hosted on [Guitar-io] (https://dvalent.github.io/guitar-io/)
+Guitar-IO is constructed using the VUE framework and currently hosted on [Guitar-io](https://dvalent.github.io/guitar-io/)
 
 ## Project setup
 ```
